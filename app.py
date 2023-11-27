@@ -65,3 +65,41 @@ def get_cupcake(cupcake_id):
     cupcake = Cupcake.query.get_or_404(cupcake_id)
 
     return jsonify(cupcake=cupcake.to_dict())
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
+def update_cupcake(cupcake_id):
+    """Update cupcake from data in request. Return updated data.
+
+    Returns JSON like:
+        {cupcake: [{id, flavor, rating, size, image}]}
+    """
+
+    data = request.json
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = data["flavor"]
+    cupcake.size = data["size"]
+    cupcake.rating = data["rating"]
+    cupcake.image = data["image"]
+
+    db.session.add(cupcake)
+    db.session.commit()
+
+    return jsonify(cupcake=cupcake.to_dict())
+
+
+@app.route("/api/cupcaked/<int:cupcake_id>", methods=["DELETE"])
+def remove_cupcake(cupcake_id):
+    """Delete cupcake and return confirmation message.
+
+    Returns JSON of {message: "Deleted"}
+    """
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    db.session.delete(cupcake)
+    db.session.commit()
+
+    return jsonify(message="Delete")
