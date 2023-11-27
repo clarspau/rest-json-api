@@ -90,7 +90,7 @@ def update_cupcake(cupcake_id):
     return jsonify(cupcake=cupcake.to_dict())
 
 
-@app.route("/api/cupcaked/<int:cupcake_id>", methods=["DELETE"])
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["DELETE"])
 def remove_cupcake(cupcake_id):
     """Delete cupcake and return confirmation message.
 

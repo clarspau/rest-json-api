@@ -107,3 +107,56 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+# Added tests for the PATCH and DELETE routes
+
+    def test_update_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 200)
+            data = resp.json
+            self.assertEqual(data, {
+                "cupcake": {
+                    "id": self.cupcake.id,
+                    "flavor": "TestFlavor2",
+                    "size": "TestSize2",
+                    "rating": 10,
+                    "image": "http://test.com/cupcake2.jpg"
+                }
+            })
+
+            # Make sure the Cupcake was actually updated in the database
+            updated_cupcake = Cupcake.query.get(self.cupcake.id)
+            self.assertEqual(updated_cupcake.flavor, "TestFlavor2")
+
+    def test_update_cupcake_missing(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/99999"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 404)
+            data = resp.json
+            self.assertEqual(data, {"message": "Cupcake not found"})
+
+    def test_delete_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+            data = resp.json
+            self.assertEqual(data, {"message": "Deleted"})
+
+            deleted_cupcake = Cupcake.query.get(self.cupcake.id)
+            self.assertIsNone(deleted_cupcake)
+
+    def test_delete_cupcake_missing(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/99999"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)
+            data = resp.json
+            self.assertEqual(data, {"message": "Cupcake not found"})
